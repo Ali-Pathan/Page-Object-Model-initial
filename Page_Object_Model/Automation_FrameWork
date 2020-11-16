@@ -1,0 +1,135 @@
+
+First I have to create config.properties file and inside
+
+url = https://www.expedia.com/
+
+username = seleninum.automation2020@gmail.com
+password = seleninum2020
+
+browser = chrome
+
+second ---
+
+public class TestBase {
+	
+	public static WebDriver driver;
+	public static Properties prop;
+	
+	
+	public TestBase(){
+		try {
+			prop = new Properties();
+			FileInputStream ip = new FileInputStream("/Users/rajive/EclipseRoot/Page_Object_Model/src/main/java/config/config.properties");
+			prop.load(ip);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	public static void initialization(){
+		String browserName = prop.getProperty("browser");
+		
+	    if(browserName.equalsIgnoreCase("firefox")){
+	        System.setProperty("webdriver.firefox.marionette","/Users/rajive/EclipseRoot/Page_Object_Model/Driver/geckodriver"); 
+	      
+	        driver = new FirefoxDriver();
+	        System.out.println("Launched My Automation in the FireFox Browser");
+
+	    }
+	    if(browserName.equalsIgnoreCase("chrome")){
+
+	        System.setProperty("webdriver.chrome.driver", "/Users/rajive/EclipseRoot/Page_Object_Model/Driver/chromedriver");
+	        driver = new ChromeDriver();
+	        System.out.println("Launched My Automation in the Chrome Browser");
+	    }
+	    else if(browserName.equalsIgnoreCase("IE")){
+
+	        System.setProperty("webdriver.ie.driver", "D:\\My Work\\Setup\\JAR\\driver\\IEDriverServer.exe");
+	        driver = new InternetExplorerDriver();
+	        System.out.println("Launched My Automation in the Internet Explorer Browser");
+	    }
+	    else if(browserName.equalsIgnoreCase("opera")){
+
+	        System.setProperty("webdriver.opera.driver", "/Users/rajive/EclipseRoot/Page_Object_Model/Driver/operadriver");
+	        driver = new OperaDriver(); 
+	        System.out.println("Launched My Automation in the Opera Browser");
+
+	    }
+		
+		
+		driver.manage().window().maximize();
+		driver.manage().deleteAllCookies();
+		driver.manage().timeouts().pageLoadTimeout(TestUtil.PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(TestUtil.IMPLICIT_WAIT, TimeUnit.SECONDS);
+		
+		driver.get(prop.getProperty("url"));
+		
+	}
+	
+
+
+}
+
+
+3rd 
+public class TestUtil extends TestBase{
+	
+	public static long PAGE_LOAD_TIMEOUT = 20;
+	public static long IMPLICIT_WAIT = 20;
+
+}
+
+
+4rth
+public class FirstLandingPage extends TestBase{
+	
+	
+	
+	
+	@FindBy(xpath = "//*[contains(@id,'gc-custom-header-nav-bar-acct-menu')]")
+	WebElement SignIn;
+	
+	
+	
+	
+	
+	public FirstLandingPage() {
+		
+		PageFactory.initElements(driver, this);
+	}
+	
+	public String validateFirstLandingPageTitle(){
+		return driver.getTitle();
+	}
+
+}
+
+5th
+	//creating global
+	FirstLandingPage firstlandingpage;
+	
+	
+	public FirstLandingPageTest() {
+		super();
+		
+	}
+	
+	@BeforeMethod
+	public void setUp(){
+		initialization();
+		//created class object
+		firstlandingpage = new FirstLandingPage();
+		
+	
+	}
+	
+	
+	
+	
+	
+	@Test(priority=1)
+	public void validateFirstLandingPageTitle(){
+		String title = firstlandingpage.validateFirstLandingPageTitle();
+		Assert.assertEquals(title, "Expedia Travel: Search Hotels, Cheap Flights, Car Rentals & Vacations");
+	}
